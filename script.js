@@ -1,77 +1,70 @@
+/**
+ * Todo List — простое приложение для управления задачами.
+ * Функции: добавление, удаление, отметка выполнения, localStorage, защита от XSS.
+ */
+
+// Ключ для хранения задач в localStorage
 const STORAGE_KEY = "todoListTasks";
 
+// Ссылки на элементы DOM
 const form = document.getElementById("todo-form");
 const input = document.getElementById("todo-input");
 const list = document.getElementById("todo-list");
 const emptyState = document.getElementById("empty-state");
 const taskCount = document.getElementById("task-count");
-const clearCompletedBtn = document.getElementById("clear-completed");
 
+// Массив задач в памяти: { id, text, completed }
 let tasks = loadTasks();
 
+// ===== Работа с localStorage =====
+
+/** Загружает задачи из localStorage или возвращает пустой массив */
 function loadTasks() {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
+    const data = localStorage.getItem(STORAGE_KEY);
+    return data ? JSON.parse(data) : [];
   } catch {
+    // Если данные повреждены — начинаем с чистого списка
     return [];
   }
 }
 
+/** Сохраняет текущий массив задач в localStorage */
 function saveTasks() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
 }
 
+// ===== Вспомогательные функции =====
+
+/** Генерирует уникальный id для новой задачи */
 function createId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
-function render() {
-  list.innerHTML = "";
-
-  tasks.forEach((task) => {
-    const li = document.createElement("li");
-    li.className = "todo-item" + (task.completed ? " completed" : "");
-    li.dataset.id = task.id;
-
-    li.innerHTML = `
-      <button type="button" class="checkbox" aria-label="Toggle complete">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
-          <polyline points="20 6 9 17 4 12"></polyline>
-        </svg>
-      </button>
-      <span class="todo-text">${escapeHtml(task.text)}</span>
-      <button type="button" class="delete-btn" aria-label="Delete task">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-    `;
-
-    list.appendChild(li);
-  });
-
-  const activeCount = tasks.filter((t) => !t.completed).length;
-  const completedCount = tasks.length - activeCount;
-
-  taskCount.textContent =
-    tasks.length === 0
-      ? "0 tasks"
-      : activeCount === 1
-        ? "1 task left"
-        : `${activeCount} tasks left`;
-
-  clearCompletedBtn.hidden = completedCount === 0;
-  emptyState.classList.toggle("hidden", tasks.length > 0);
-}
-
+/**
+ * Экранирует текст для безопасной вставки в HTML (защита от XSS).
+ * Преобразует спецсимволы в HTML-сущности.
+ */
 function escapeHtml(text) {
   const div = document.createElement("div");
   div.textContent = text;
   return div.innerHTML;
 }
 
+/** Возвращает слово «задача» в правильном склонении */
+function pluralizeTasks(count) {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+
+  if (mod100 >= 11 && mod100 <= 14) return "задач";
+  if (mod10 === 1) return "задача";
+  if (mod10 >= 2 && mod10 <= 4) return "задачи";
+  return "задач";
+}
+
+// ===== Операции с задачами =====
+
+/** Добавляет новую задачу в начало списка */
 function addTask(text) {
   const trimmed = text.trim();
   if (!trimmed) return;
@@ -86,6 +79,7 @@ function addTask(text) {
   render();
 }
 
+/** Переключает статус выполнения задачи */
 function toggleTask(id) {
   const task = tasks.find((t) => t.id === id);
   if (!task) return;
@@ -95,38 +89,69 @@ function toggleTask(id) {
   render();
 }
 
+/** Удаляет задачу по id */
 function deleteTask(id) {
   tasks = tasks.filter((t) => t.id !== id);
   saveTasks();
   render();
 }
 
-function clearCompleted() {
-  tasks = tasks.filter((t) => !t.completed);
-  saveTasks();
-  render();
+// ===== Отрисовка интерфейса =====
+
+/** Перерисовывает список задач и обновляет счётчик */
+function render() {
+  list.innerHTML = "";
+
+  tasks.forEach((task) => {
+    const item = document.createElement("li");
+    item.className = "todo-item" + (task.completed ? " todo-item--completed" : "");
+    item.dataset.id = task.id;
+
+    // Разметка кнопок; текст задачи экранируется через escapeHtml
+    item.innerHTML = `
+      <button type="button" class="todo-item__toggle" aria-label="Отметить выполненной">
+        <span class="todo-item__toggle-icon">✓</span>
+      </button>
+      <span class="todo-item__text">${escapeHtml(task.text)}</span>
+      <button type="button" class="btn btn--icon todo-item__delete" aria-label="Удалить задачу">✕</button>
+    `;
+
+    list.appendChild(item);
+  });
+
+  const activeCount = tasks.filter((t) => !t.completed).length;
+
+  taskCount.textContent =
+    tasks.length === 0
+      ? "0 задач"
+      : `Осталось ${activeCount} ${pluralizeTasks(activeCount)}`;
+
+  emptyState.classList.toggle("empty-state--hidden", tasks.length > 0);
 }
 
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
+// ===== Обработчики событий =====
+
+// Отправка формы — добавление задачи
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
   addTask(input.value);
   input.value = "";
   input.focus();
 });
 
-list.addEventListener("click", (e) => {
-  const item = e.target.closest(".todo-item");
+// Делегирование кликов по списку (toggle / delete)
+list.addEventListener("click", (event) => {
+  const item = event.target.closest(".todo-item");
   if (!item) return;
 
   const id = item.dataset.id;
 
-  if (e.target.closest(".checkbox")) {
+  if (event.target.closest(".todo-item__toggle")) {
     toggleTask(id);
-  } else if (e.target.closest(".delete-btn")) {
+  } else if (event.target.closest(".todo-item__delete")) {
     deleteTask(id);
   }
 });
 
-clearCompletedBtn.addEventListener("click", clearCompleted);
-
+// Первичная отрисовка при загрузке страницы
 render();

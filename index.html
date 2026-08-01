@@ -1,46 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Todo List</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Список задач</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="app">
-    <header class="header">
-      <h1>Todo List</h1>
-      <p class="subtitle">Stay organized, one task at a time</p>
+  <main class="card" aria-labelledby="app-title">
+    <header class="card__header">
+      <h1 id="app-title">Список задач</h1>
+      <p class="card__subtitle">Планируйте день и отмечайте выполненное</p>
     </header>
 
-    <form class="input-form" id="todo-form">
-      <input
-        type="text"
-        id="todo-input"
-        placeholder="What needs to be done?"
-        autocomplete="off"
-        maxlength="200"
-        required
-      >
-      <button type="submit" id="add-btn" aria-label="Add task">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <line x1="12" y1="5" x2="12" y2="19"></line>
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-      </button>
-    </form>
+    <!-- Форма добавления новой задачи -->
+    <section class="card__section" aria-label="Добавление задачи">
+      <form class="todo-form" id="todo-form">
+        <label class="visually-hidden" for="todo-input">Новая задача</label>
+        <input
+          class="todo-form__input"
+          type="text"
+          id="todo-input"
+          name="task"
+          placeholder="Что нужно сделать?"
+          autocomplete="off"
+          maxlength="200"
+          required
+        >
+        <button class="btn btn--primary" type="submit" id="add-btn">
+          Добавить
+        </button>
+      </form>
+    </section>
 
-    <div class="stats" id="stats">
-      <span id="task-count">0 tasks</span>
-      <button type="button" class="clear-completed" id="clear-completed" hidden>
-        Clear completed
-      </button>
-    </div>
+    <!-- Счётчик и список задач -->
+    <section class="card__section" aria-label="Список задач">
+      <p class="todo-stats" id="task-count" aria-live="polite">0 задач</p>
 
-    <ul class="todo-list" id="todo-list"></ul>
+      <ul class="todo-list" id="todo-list" role="list"></ul>
 
-    <p class="empty-state" id="empty-state">No tasks yet. Add one above!</p>
-  </div>
+      <p class="empty-state" id="empty-state">
+        Задач пока нет. Добавьте первую выше!
+      </p>
+    </section>
+  </main>
 
   <script src="script.js"></script>
 </body>
