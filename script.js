@@ -1,19 +1,14 @@
-// DOM Элементтери
 const todoForm = document.getElementById('todo-form');
 const todoInput = document.getElementById('todo-input');
 const todoList = document.getElementById('todo-list');
-const prioritySelect = document.getElementById('priority-select') || { value: 'low' };
-const categorySelect = document.getElementById('category-select') || { value: 'personal' };
 const statsText = document.getElementById('stats-text');
 
-// LocalStorage'ден маалыматты алуу
 let todos = JSON.parse(localStorage.getItem('todos-pro')) || [];
 
 function saveToLocalStorage() {
   localStorage.setItem('todos-pro', JSON.stringify(todos));
 }
 
-// Статистиканы жаңылоо Функциясы
 function updateStats() {
   const total = todos.length;
   const completed = todos.filter(t => t.completed).length;
@@ -24,26 +19,31 @@ function updateStats() {
   }
 }
 
-// Экранга чыгаруу (Render)
 function renderTodos() {
+  if (!todoList) return;
   todoList.innerHTML = '';
 
   if (todos.length === 0) {
-    todoList.innerHTML = '<li class="empty-msg" style="text-align:center; color:#888; padding:15px;">Задач пока нет. Добавьте первую!</li>';
+    todoList.innerHTML = '<li style="text-align:center; color:#888; padding:15px; list-style:none;">Задач пока нет. Добавьте первую!</li>';
     updateStats();
     return;
   }
 
   todos.forEach((todo, index) => {
     const li = document.createElement('li');
-    li.className = todo-item ${todo.completed ? 'completed' : ''};
+    li.style.cssText = "display: flex; align-items: center; justify-content: space-between; padding: 10px; margin-bottom: 8px; background: #f4f4f9; border-radius: 8px; list-style: none;";
+    
+    if (todo.completed) {
+      li.style.opacity = "0.6";
+      li.style.textDecoration = "line-through";
+    }
 
     li.innerHTML = `
-      <div class="todo-content" onclick="toggleComplete(${index})">
-        <input type="checkbox" ${todo.completed ? 'checked' : ''}>
-        <span class="todo-text">${escapeHtml(todo.text)}</span>
+      <div style="display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="toggleComplete(${index})">
+        <input type="checkbox" ${todo.completed ? 'checked' : ''} style="cursor: pointer;">
+        <span style="font-size: 16px; color: #333;">${escapeHtml(todo.text)}</span>
       </div>
-      <button class="delete-btn" onclick="deleteTodo(${index})" title="Удалить">✕</button>
+      <button onclick="deleteTodo(${index})" style="background: #ff4d4d; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">✕</button>
     `;
 
     todoList.appendChild(li);
@@ -52,38 +52,29 @@ function renderTodos() {
   updateStats();
 }
 
-// Тапшырма кошуу
 function addTodo(event) {
   event.preventDefault();
   const text = todoInput.value.trim();
   if (!text) return;
 
-  const newTodo = {
-    text: text,
-    completed: false
-  };
-
-  todos.push(newTodo);
+  todos.push({ text: text, completed: false });
   saveToLocalStorage();
   renderTodos();
   todoInput.value = '';
 }
 
-// Бүткөнүн белгилөө
 function toggleComplete(index) {
   todos[index].completed = !todos[index].completed;
   saveToLocalStorage();
   renderTodos();
 }
 
-// Өчүрүү
 function deleteTodo(index) {
   todos.splice(index, 1);
   saveToLocalStorage();
   renderTodos();
 }
 
-// XSS Коргоо
 function escapeHtml(str) {
   const div = document.createElement('div');
   div.innerText = str;
@@ -94,5 +85,4 @@ if (todoForm) {
   todoForm.addEventListener('submit', addTodo);
 }
 
-// Ишке киргизүү
 renderTodos();
