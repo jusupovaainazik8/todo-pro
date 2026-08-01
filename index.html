@@ -1,48 +1,118 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Список задач</title>
+  <title>Todo Pro — Список задач</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="card" aria-labelledby="app-title">
-    <header class="card__header">
-      <h1 id="app-title">Список задач</h1>
-      <p class="card__subtitle">Планируйте день и отмечайте выполненное</p>
+  <main class="app" aria-labelledby="app-title">
+    <!-- Шапка -->
+    <header class="app__header">
+      <div class="app__header-text">
+        <h1 id="app-title">Todo Pro</h1>
+        <p class="app__subtitle">Умный список задач</p>
+      </div>
+      <button
+        class="theme-toggle"
+        id="theme-toggle"
+        type="button"
+        aria-label="Переключить тему"
+        title="Переключить тему"
+      >
+        <span class="theme-toggle__icon theme-toggle__icon--light">☀️</span>
+        <span class="theme-toggle__icon theme-toggle__icon--dark">🌙</span>
+      </button>
     </header>
 
-    <!-- Форма добавления новой задачи -->
-    <section class="card__section" aria-label="Добавление задачи">
-      <form class="todo-form" id="todo-form">
-        <label class="visually-hidden" for="todo-input">Новая задача</label>
-        <input
-          class="todo-form__input"
-          type="text"
-          id="todo-input"
-          name="task"
-          placeholder="Что нужно сделать?"
-          autocomplete="off"
-          maxlength="200"
-          required
-        >
-        <button class="btn btn--primary" type="submit" id="add-btn">
-          Добавить
-        </button>
+    <!-- Прогресс -->
+    <section class="progress" aria-label="Прогресс выполнения">
+      <div class="progress__info">
+        <span id="progress-text">Выполнено 0 из 0 задач (0%)</span>
+      </div>
+      <div class="progress__bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div class="progress__fill" id="progress-fill"></div>
+      </div>
+    </section>
+
+    <!-- Поиск -->
+    <section class="search" aria-label="Поиск задач">
+      <label class="visually-hidden" for="search-input">Поиск</label>
+      <input
+        class="search__input"
+        type="search"
+        id="search-input"
+        placeholder="🔍  Поиск по названию..."
+        autocomplete="off"
+      >
+    </section>
+
+    <!-- Форма добавления -->
+    <section class="add-form" aria-label="Добавление задачи">
+      <form id="todo-form">
+        <div class="add-form__row">
+          <label class="visually-hidden" for="todo-input">Новая задача</label>
+          <input
+            class="add-form__input"
+            type="text"
+            id="todo-input"
+            placeholder="Что нужно сделать?"
+            maxlength="200"
+            required
+            autocomplete="off"
+          >
+        </div>
+        <div class="add-form__meta">
+          <select class="add-form__select" id="priority-select" aria-label="Приоритет">
+            <option value="low">🟢 Низкий</option>
+            <option value="medium" selected>🟡 Средний</option>
+            <option value="high">🔴 Высокий</option>
+          </select>
+          <select class="add-form__select" id="tag-select" aria-label="Категория">
+            <option value="work">💼 Работа</option>
+            <option value="study">📚 Учеба</option>
+            <option value="personal">🏠 Личное</option>
+          </select>
+          <input
+            class="add-form__date"
+            type="date"
+            id="due-date-input"
+            aria-label="Срок выполнения"
+          >
+          <button class="btn btn--primary" type="submit">Добавить</button>
+        </div>
       </form>
     </section>
 
-    <!-- Счётчик и список задач -->
-    <section class="card__section" aria-label="Список задач">
-      <p class="todo-stats" id="task-count" aria-live="polite">0 задач</p>
+    <!-- Фильтры по статусу -->
+    <nav class="filters" id="status-filters" aria-label="Фильтр по статусу">
+      <button class="filter-btn filter-btn--active" type="button" data-filter="all">Все</button>
+      <button class="filter-btn" type="button" data-filter="active">Активные</button>
+      <button class="filter-btn" type="button" data-filter="completed">Завершённые</button>
+    </nav>
 
-      <ul class="todo-list" id="todo-list" role="list"></ul>
+    <!-- Фильтры по тегам -->
+    <nav class="tag-filters" id="tag-filters" aria-label="Фильтр по категории">
+      <button class="tag-btn tag-btn--active" type="button" data-tag="all">Все теги</button>
+      <button class="tag-btn" type="button" data-tag="work">💼 Работа</button>
+      <button class="tag-btn" type="button" data-tag="study">📚 Учеба</button>
+      <button class="tag-btn" type="button" data-tag="personal">🏠 Личное</button>
+    </nav>
 
-      <p class="empty-state" id="empty-state">
-        Задач пока нет. Добавьте первую выше!
-      </p>
+    <!-- Список задач -->
+    <section class="task-section" aria-label="Список задач">
+      <ul class="task-list" id="todo-list" role="list"></ul>
+      <p class="empty-state" id="empty-state">Задач пока нет. Добавьте первую!</p>
     </section>
+
+    <!-- Подвал -->
+    <footer class="app__footer">
+      <span class="app__footer-stats" id="footer-stats">0 активных задач</span>
+      <button class="btn btn--ghost" type="button" id="clear-completed" hidden>
+        🗑 Удалить выполненные
+      </button>
+    </footer>
   </main>
 
   <script src="script.js"></script>
