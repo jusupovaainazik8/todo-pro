@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo List</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>Todo List</h1>
+      <p class="subtitle">Stay organized, one task at a time</p>
+    </header>
+
+    <form class="input-form" id="todo-form">
+      <input
+        type="text"
+        id="todo-input"
+        placeholder="What needs to be done?"
+        autocomplete="off"
+        maxlength="200"
+        required
+      >
+      <button type="submit" id="add-btn" aria-label="Add task">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </button>
+    </form>
+
+    <div class="stats" id="stats">
+      <span id="task-count">0 tasks</span>
+      <button type="button" class="clear-completed" id="clear-completed" hidden>
+        Clear completed
+      </button>
+    </div>
+
+    <ul class="todo-list" id="todo-list"></ul>
+
+    <p class="empty-state" id="empty-state">No tasks yet. Add one above!</p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
