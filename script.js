@@ -11,11 +11,10 @@ function saveToLocalStorage() {
 
 function updateStats() {
   const total = todos.length;
-  const completed = todos.filter(t => t.completed).length;
+  const completed = todos.filter(function(t) { return t.completed; }).length;
   const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
-
   if (statsText) {
-    statsText.innerText = Выполнено ${completed} из ${total} задач (${percent}%);
+    statsText.innerText = 'Выполнено ' + completed + ' из ' + total + ' задач (' + percent + '%)';
   }
 }
 
@@ -29,22 +28,23 @@ function renderTodos() {
     return;
   }
 
-  todos.forEach((todo, index) => {
+  todos.forEach(function(todo, index) {
     const li = document.createElement('li');
-    li.style.cssText = "display: flex; align-items: center; justify-content: space-between; padding: 10px; margin-bottom: 8px; background: #f4f4f9; border-radius: 8px; list-style: none;";
+    li.style.cssText = "display: flex; align-items: center; justify-content: space-between; padding: 12px; margin-bottom: 8px; background: #f4f4f9; border-radius: 8px; list-style: none;";
     
     if (todo.completed) {
-      li.style.opacity = "0.6";
+      li.style.opacity = "0.5";
       li.style.textDecoration = "line-through";
     }
 
-    li.innerHTML = `
-      <div style="display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="toggleComplete(${index})">
-        <input type="checkbox" ${todo.completed ? 'checked' : ''} style="cursor: pointer;">
-        <span style="font-size: 16px; color: #333;">${escapeHtml(todo.text)}</span>
-      </div>
-      <button onclick="deleteTodo(${index})" style="background: #ff4d4d; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">✕</button>
-    `;
+    const checkState = todo.completed ? 'checked' : '';
+
+    li.innerHTML = 
+      '<div style="display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="toggleComplete(' + index + ')">' +
+        '<input type="checkbox" ' + checkState + ' style="cursor: pointer;">' +
+        '<span style="font-size: 16px; color: #333;">' + escapeHtml(todo.text) + '</span>' +
+      '</div>' +
+      '<button onclick="deleteTodo(' + index + ')" style="background: #ef4444; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer;">✕</button>';
 
     todoList.appendChild(li);
   });
